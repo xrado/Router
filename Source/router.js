@@ -1,22 +1,20 @@
 /* 
 ---
 description: Router provides methods for routing client-side pages, and connecting them to actions and events based on hashchange event.
-
 authors: Radovan Lozej
-
 license: MIT-style
-
-inspiration:
-http://documentcloud.github.com/backbone/#Router
-Element.Events.hashchange by http://github.com/greggoryhz/MooTools-onHashChange-Event/
-_normalize by https://github.com/visionmedia/express
-
-requires: [Core, More/tring.QueryString]
-
+requires: [Core, More/String.QueryString]
 provides:
   - Router
 ---
- */
+*/
+
+/*
+inspiration:
+http://documentcloud.github.com/backbone/#Router
+Element.Events.hashchange by http://github.com/greggoryhz/MooTools-onHashChange-Event/
+_normalize by https://github.com/visionmedia/express 
+*/
 
 // Cross browser support for onHashChange event
 
