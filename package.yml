@@ -5,5 +5,8 @@ license: MIT
 category: Utilities
 tags: [hashchange,router,fragment]
 current: 0.1
+demo: http://xrado.github.com/Router/Demo/
 sources:
   - "Source/Router.js"
+
+

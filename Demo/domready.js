@@ -1,6 +1,6 @@
 window.addEvent('domready',function(){
 	
-	var App = Router.implement({
+		var App = Router.implement({
 		// routes definition
 		routes: {
 			''						: 'index',
@@ -9,12 +9,12 @@ window.addEvent('domready',function(){
 			'#!test2/:query/*'		: 'test2',
 		},
 		
-		// runned on router init
+		// router init
 		init: function(){  
 			console.log('init')
 		},
 		
-		// runned before route method
+		// before route method
 		before: function(){ 
 			console.log('before')
 		},
@@ -39,12 +39,12 @@ window.addEvent('domready',function(){
 			console.log(this.route,this.req,this.param,this.query)
 		},
 		
-		// runned after route method
+		// after route method
 		after: function(){
 			console.log('after')
 		},
 		
-		// runned if no route match
+		// no route match
 		notfound: function(){
 			alert('notfound')
 			window.app.navigate('');
