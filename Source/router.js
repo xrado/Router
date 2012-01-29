@@ -1,23 +1,21 @@
 /* 
- * 
- * description: Router provides methods for routing client-side pages, and connecting them to actions and events based on hashchange event.
- * 
- * author: xrado (radovan.lozej@gmail.com) 
- * 
- * license: MIT-style
- * 
- * inspiration:
- * http://documentcloud.github.com/backbone/#Router
- * Element.Events.hashchange by http://github.com/greggoryhz/MooTools-onHashChange-Event/
- * _normalize by https://github.com/visionmedia/express
- * 
- * requires:
- *   core: '*'
- *   more: 'String.QueryString'
- * 
- * provides:
- *   - Router
- * 
+---
+description: Router provides methods for routing client-side pages, and connecting them to actions and events based on hashchange event.
+
+author: xrado (radovan.lozej@gmail.com) 
+
+license: MIT-style
+
+inspiration:
+http://documentcloud.github.com/backbone/#Router
+Element.Events.hashchange by http://github.com/greggoryhz/MooTools-onHashChange-Event/
+_normalize by https://github.com/visionmedia/express
+
+requires: [Core, More/tring.QueryString]
+
+provides:
+  - Router
+---
  */
 
 // Cross browser support for onHashChange event
@@ -68,13 +66,14 @@ var Router = new Class({
 					var args = found.slice(1)
 					var param = {}
 					Array.each(args,function(a,i){
-						param[keys[i].name] = a
+						if(keys[i]) param[keys[i].name] = a
 					});
 					self.route = route;
 					self.param = param || {};
 					self.query = query ? query.parseQueryString() : {};
 					self.before()
-					self[self.routes[route]]()
+					if(self[self.routes[route]]) self[self.routes[route]]()
+					else alert('"'+self.routes[route]+'" route method is missing, define it')
 					self.after()
 				} 
 			}
