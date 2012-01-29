@@ -2,7 +2,7 @@
 ---
 description: Router provides methods for routing client-side pages, and connecting them to actions and events based on hashchange event.
 
-author: xrado (radovan.lozej@gmail.com) 
+authors: Radovan Lozej
 
 license: MIT-style
 
