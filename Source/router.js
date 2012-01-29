@@ -1,12 +1,15 @@
-/* 
+/*
 ---
-description: Router provides methods for routing client-side pages, and connecting them to actions and events based on hashchange event.
+
+name: Router
+
+license: MIT-style license.
+
 authors: Radovan Lozej
-license: MIT-style
-requires: [Core, More/String.QueryString]
-provides:
-  - Router
----
+
+provides: [Router]
+
+...
 */
 
 /*
