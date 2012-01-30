@@ -4,7 +4,7 @@ description: MooTools Router
 license: MIT
 category: Utilities
 tags: [hashchange,router,fragment]
-current: 0.1
+current: 0.2
 demo: http://xrado.github.com/Router/Demo/
 sources:
   - "Source/Router.js"
