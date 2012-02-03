@@ -76,6 +76,7 @@ var Router = new Class({
 					if(self[self.routes[route]]) self[self.routes[route]]()
 					else alert('"'+self.routes[route]+'" route method is missing, define it')
 					self.after()
+					break;
 				} 
 			}
 			if(notfound) self.notfound()
@@ -116,6 +117,3 @@ var Router = new Class({
 	}
 	
 });
-
-
-
