@@ -1,11 +1,11 @@
 name: Router
-author: xrado
+author: d_mitar
 description: MooTools Router
 license: MIT
 category: Utilities
 tags: [hashchange,router,fragment]
-current: 0.3
-demo: http://xrado.github.com/Router/Demo/
+current: 0.4
+demo: http://dimitarchristoff.github.com/Router/Demo/
 sources:
   - "Source/Router.js"
 

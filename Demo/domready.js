@@ -1,6 +1,6 @@
 window.addEvent('domready',function(){
 	
-		var App = Router.implement({
+    var App = new Router({
 		// routes definition
 		routes: {
 			''						: 'index',
@@ -10,47 +10,46 @@ window.addEvent('domready',function(){
 		},
 		
 		// router init
-		init: function(){  
+		onReady: function(){
 			console.log('init')
 		},
 		
 		// before route method
-		before: function(){ 
+		onBefore: function(){
 			console.log('before')
 		},
 		
 		// routes methods
-		index: function(){
+		onIndex: function(){
 			console.log('index')
 		},
 		
-		help: function(){
+		onHelp: function(){
 			console.log('help')
 			console.log(this.route,this.req,this.param,this.query)
 		},
 		
-		test1: function(){
+		onTest1: function(query, id){
 			console.log('test1')
 			console.log(this.route,this.req,this.param,this.query)
 		},
 		
-		test2: function(){
+		onTest2: function(query){
 			console.log('test2')
 			console.log(this.route,this.req,this.param,this.query)
 		},
 		
 		// after route method
-		after: function(){
+		onAfter: function(){
 			console.log('after')
 		},
 		
 		// no route match
-		notfound: function(){
-			alert('notfound')
+		onError: function(error){
+			alert(error);
 			window.app.navigate('');
 		}
 	});
 	
-	window.app = new App();
-	
+
 });

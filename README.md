@@ -6,58 +6,56 @@ Router provides methods for routing client-side pages, and connecting them to ac
 How to use
 ----------
 
-	var App = Router.implement({
-		// routes definition
-		routes: {
-			''						: 'index',
-			'#!help'				: 'help',
-			'#!test1/:query/:id?'	: 'test1',
-			'#!test2/:query/*'		: 'test2',
-		},
-		
-		// router init
-		init: function(){  
-			console.log('init')
-		},
-		
-		// before route method
-		before: function(){ 
-			console.log('before')
-		},
-		
-		// routes methods
-		index: function(){
-			console.log('index')
-		},
-		
-		help: function(){
-			console.log('help')
-			console.log(this.route,this.req,this.param,this.query)
-		},
-		
-		test1: function(){
-			console.log('test1')
-			console.log(this.route,this.req,this.param,this.query)
-		},
-		
-		test2: function(){
-			console.log('test2')
-			console.log(this.route,this.req,this.param,this.query)
-		},
-		
-		// after route method
-		after: function(){
-			console.log('after')
-		},
-		
-		// no route match
-		notfound: function(){
-			alert('notfound')
-			window.app.navigate('');
-		}
-	});
-	
-	window.app = new App();
+	var App = new Router({
+        // routes definition
+        routes: {
+            ''						: 'index',
+            '#!help'				: 'help',
+            '#!test1/:query/:id?'	: 'test1',
+            '#!test2/:query/*'		: 'test2',
+        },
+
+        // router init
+        onReady: function(){
+            console.log('init')
+        },
+
+        // before route method
+        onBefore: function(){
+            console.log('before')
+        },
+
+        // routes methods
+        onIndex: function(){
+            console.log('index')
+        },
+
+        onHelp: function(){
+            console.log('help')
+            console.log(this.route,this.req,this.param,this.query)
+        },
+
+        onTest1: function(query, id){
+            console.log('test1')
+            console.log(this.route,this.req,this.param,this.query)
+        },
+
+        onTest2: function(query){
+            console.log('test2')
+            console.log(this.route,this.req,this.param,this.query)
+        },
+
+        // after route method
+        onAfter: function(){
+            console.log('after')
+        },
+
+        // no route match
+        onError: function(error){
+            alert(error);
+            window.app.navigate('');
+        }
+    });
 
 Requires
 -----------------
