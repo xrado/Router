@@ -7,6 +7,7 @@ window.addEvent('domready',function(){
 			'#!help'				: 'help',
 			'#!test1/:query/:id?'	: 'test1',
 			'#!test2/:query/*'		: 'test2',
+            '#!error'               : 'dummyerror'
 		},
 		
 		// router init
@@ -15,9 +16,17 @@ window.addEvent('domready',function(){
 		},
 		
 		// before route method
-		onBefore: function(){
-			console.log('before')
+		onBefore: function(routeId){
+            console.log('before', routeId)
 		},
+
+        'onIndex:before': function() {
+            console.log('we are about to go to the index route');
+        },
+
+        'onIndex:after': function() {
+            console.log('navigated already to index route');
+        },
 		
 		// routes methods
 		onIndex: function(){
@@ -47,8 +56,13 @@ window.addEvent('domready',function(){
 		// no route match
 		onError: function(error){
 			alert(error);
-			window.app.navigate('');
-		}
+			this.navigate('');
+		},
+
+        onUndefined: function() {
+
+        }
+
 	});
 	
 

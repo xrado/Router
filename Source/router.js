@@ -7,7 +7,12 @@ license: MIT-style license.
 
 authors: [Radovan Lozej, DimitarChristoff]
 
-provides: [Router]
+requires:
+ - Core/DOMEvent
+ - Core/Class
+ - More/String.QueryString
+
+provides: Router
 
 ...
 */
@@ -22,7 +27,7 @@ provides: [Router]
      Element.Events.hashchange by http://github.com/greggoryhz/MooTools-onHashChange-Event/
      _normalize by https://github.com/visionmedia/express
 
-     */
+    */
 
     Element.Events.hashchange = {
         // Cross browser support for onHashChange event
@@ -79,7 +84,8 @@ provides: [Router]
                 for(route in self.routes) {
                     var keys = [],
                         regex = self._normalize(route, keys, true, false),
-                        found = regex.exec(path);
+                        found = regex.exec(path),
+                        routeEvent = false;
 
                     if (found) {
                         notfound = false;
@@ -95,15 +101,30 @@ provides: [Router]
                         self.route = route;
                         self.param = param || {};
                         self.query = query ? query.parseQueryString() : {};
-                        self.fireEvent('before');
 
-                        if (self.routes[route]) {
-                            self.fireEvent(self.routes[route], Object.values(self.param));
+                        // find referenced events
+                        routeEvent = self.routes[route];
+
+                        // generic before route, pass route id, if avail
+                        self.fireEvent('before', routeEvent);
+
+                        // if there is an identifier and an event added
+                        if (routeEvent && self.$events[routeEvent]) {
+                            // route event was defined, fire specific before pseudo
+                            self.fireEvent(routeEvent + ':before');
+                            // call the route event handler itself, pass params as arguments
+                            self.fireEvent(routeEvent, Object.values(self.param));
                         }
                         else {
-                            self.fireEvent('error', ['Route', route, 'is undefined'].join(''));
+                            // requested route was expected but not found or event is missing
+                            self.fireEvent('error', ['Route', routeEvent, 'is undefined'].join(' '));
                         }
-                        self.fireEvent('after');
+
+                        // fire a generic after event
+                        self.fireEvent('after', routeEvent);
+
+                        // if route is defined, also fire a specific after pseudo
+                        routeEvent && self.fireEvent(routeEvent + ':after');
                         break;
                     }
                 }
