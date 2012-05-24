@@ -1,6 +1,6 @@
 window.addEvent('domready',function(){
 	
-    var App = new Router({
+    new Router({
 		// routes definition
 		routes: {
 			''						: 'index',
@@ -12,7 +12,7 @@ window.addEvent('domready',function(){
 		
 		// router init
 		onReady: function(){
-			console.log('init')
+			console.log('init');
 		},
 		
 		// before route method
@@ -20,47 +20,51 @@ window.addEvent('domready',function(){
             console.log('before', routeId)
 		},
 
+        // specific pseudos for before
         'onIndex:before': function() {
             console.log('we are about to go to the index route');
         },
 
+        // specific pseudos for after
         'onIndex:after': function() {
-            console.log('navigated already to index route');
+            console.log('navigated already to index route, update breadcrumb?');
         },
-		
-		// routes methods
-		onIndex: function(){
+
+        // after route method
+        onAfter: function(route){
+            console.info('after', route)
+        },
+
+
+        // routes events callbacks
+		onIndex: function() {
 			console.log('index')
 		},
 		
-		onHelp: function(){
-			console.log('help')
-			console.log(this.route,this.req,this.param,this.query)
+		onHelp: function() {
+			console.log('help');
+			console.log(this.route, this.req, this.param, this.query)
 		},
 		
-		onTest1: function(query, id){
-			console.log('test1')
-			console.log(this.route,this.req,this.param,this.query)
+		onTest1: function(query, id) {
+			console.info('test1', query, id);
+			console.log(this.route, this.req, this.param, this.query)
 		},
 		
-		onTest2: function(query){
-			console.log('test2')
-			console.log(this.route,this.req,this.param,this.query)
+		onTest2: function(query) {
+			console.info('test2', query);
+			console.log(this.route, this.req, this.param, this.query)
 		},
 		
-		// after route method
-		onAfter: function(){
-			console.log('after')
-		},
-		
-		// no route match
+		// no route event was found, though route was defined
 		onError: function(error){
-			alert(error);
+			console.error(error);
+            // recover by going default route
 			this.navigate('');
 		},
 
         onUndefined: function() {
-
+            console.log('this is an undefined route');
         }
 
 	});

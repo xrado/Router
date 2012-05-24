@@ -14,26 +14,20 @@ requires:
 
 provides: Router
 
+inspiration: http://documentcloud.github.com/backbone/#Router
+
 ...
 */
-
-
 ;(function() {
-    /*
 
-     inspiration:
-
-     http://documentcloud.github.com/backbone/#Router
-     Element.Events.hashchange by http://github.com/greggoryhz/MooTools-onHashChange-Event/
-     _normalize by https://github.com/visionmedia/express
-
-    */
+    var hc = 'hashchange',
+        hcSupported = !!(('on' + hc) in window);
 
     Element.Events.hashchange = {
-        // Cross browser support for onHashChange event
+        // Cross browser support for onHashChange event - http://github.com/greggoryhz/MooTools-onHashChange-Event/
         onAdd: function () {
             var hash = location.hash,
-                hashchange = function () {
+                check = function () {
                     if (hash == location.hash) {
                         return;
                     }
@@ -42,16 +36,11 @@ provides: Router
                     }
                     var value = (hash.indexOf('#') == 0 ? hash.substr(1) : hash);
 
-                    window.fireEvent('hashchange', value);
-                    document.fireEvent('hashchange', value);
+                    window.fireEvent(hc, value);
+                    document.fireEvent(hc, value);
                 };
 
-            if ("onhashchange" in window) {
-                window.onhashchange = hashchange;
-            }
-            else {
-                hashchange.periodical(100);
-            }
+            (hcSupported && (window.onhashchange = check)) || check.periodical(100);
         }
     };
 
@@ -83,7 +72,7 @@ provides: Router
 
                 for(route in self.routes) {
                     var keys = [],
-                        regex = self._normalize(route, keys, true, false),
+                        regex = self.normalize(route, keys, true, false),
                         found = regex.exec(path),
                         routeEvent = false;
 
@@ -134,19 +123,20 @@ provides: Router
             });
 
             this.fireEvent('ready');
-            this.options.triggerOnLoad && window.fireEvent('hashchange');
+            this.options.triggerOnLoad && window.fireEvent(hc);
         },
 
         navigate: function(route, trigger) {
             if (location.hash == route && trigger) {
-                window.fireEvent('hashchange');
+                window.fireEvent(hc);
             }
             else {
                 location.hash = route;
             }
         },
 
-        _normalize : function (path, keys, sensitive, strict) {
+        normalize: function(path, keys, sensitive, strict) {
+            // normalize by https://github.com/visionmedia/express
             if (path instanceof RegExp) return path;
 
             path = path.concat(strict ? '' : '/?').replace(/\/\(/g, '(?:/').replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, function(_, slash, format, key, capture, optional) {
