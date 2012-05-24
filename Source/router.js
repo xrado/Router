@@ -21,7 +21,8 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 ;(function() {
 
     var hc = 'hashchange',
-        hcSupported = !!(('on' + hc) in window);
+        hcSupported = !!(('on' + hc) in window),
+        eventHosts = [window, document];
 
     Element.Events.hashchange = {
         // Cross browser support for onHashChange event - http://github.com/greggoryhz/MooTools-onHashChange-Event/
@@ -32,7 +33,7 @@ inspiration: http://documentcloud.github.com/backbone/#Router
                         return;
 
                     hash = location.hash;
-                    [window, document].invoke('fireEvent', hc, hash.indexOf('#') == 0 ? hash.substr(1) : hash);
+                    eventHosts.invoke('fireEvent', hc, hash.indexOf('#') == 0 ? hash.substr(1) : hash);
                 };
 
             (hcSupported && (window.onhashchange = check)) || check.periodical(100);
