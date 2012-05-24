@@ -63,7 +63,7 @@ inspiration: http://documentcloud.github.com/backbone/#Router
             this.setOptions(options);
             this.options.routes && (this.routes = this.options.routes);
 
-            window.addEvent('hashchange', function(e) {
+            window.addEvent(hc, function(e) {
                 var hash = location.hash,
                     path = hash.split('?')[0],
                     query = hash.split('?')[1] || '',
