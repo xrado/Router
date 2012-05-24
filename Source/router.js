@@ -10,7 +10,6 @@ authors: [Radovan Lozej, DimitarChristoff]
 requires:
  - Core/DOMEvent
  - Core/Class
- - More/String.QueryString
 
 provides: Router
 
@@ -22,7 +21,18 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 
     var hc = 'hashchange',
         hcSupported = !!(('on' + hc) in window),
-        eventHosts = [window, document];
+        eventHosts = [window, document],
+        getQueryString = function(queryString) {
+            var result = {},
+                re = /([^&=]+)=([^&]*)/g,
+                m;
+
+            while (m = re.exec(queryString)) {
+                result[decodeURIComponent(m[1])] = decodeURIComponent(m[2]);
+            }
+
+            return result;
+        };
 
     Element.Events.hashchange = {
         // Cross browser support for onHashChange event - http://github.com/greggoryhz/MooTools-onHashChange-Event/
@@ -39,6 +49,7 @@ inspiration: http://documentcloud.github.com/backbone/#Router
             (hcSupported && (window.onhashchange = check)) || check.periodical(100);
         }
     };
+
 
     // Router
     this.Router = new Class({
@@ -85,7 +96,7 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 
                         self.route = route;
                         self.param = param || {};
-                        self.query = query ? query.parseQueryString() : {};
+                        self.query = query && getQueryString(query);
 
                         // find referenced events
                         routeEvent = self.routes[route];
