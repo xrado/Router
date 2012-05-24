@@ -28,16 +28,11 @@ inspiration: http://documentcloud.github.com/backbone/#Router
         onAdd: function () {
             var hash = location.hash,
                 check = function () {
-                    if (hash == location.hash) {
+                    if (hash == location.hash)
                         return;
-                    }
-                    else {
-                        hash = location.hash;
-                    }
-                    var value = (hash.indexOf('#') == 0 ? hash.substr(1) : hash);
 
-                    window.fireEvent(hc, value);
-                    document.fireEvent(hc, value);
+                    hash = location.hash;
+                    [window, document].invoke('fireEvent', hc, hash.indexOf('#') == 0 ? hash.substr(1) : hash);
                 };
 
             (hcSupported && (window.onhashchange = check)) || check.periodical(100);
@@ -63,7 +58,7 @@ inspiration: http://documentcloud.github.com/backbone/#Router
             this.setOptions(options);
             this.options.routes && (this.routes = this.options.routes);
 
-            window.addEvent('hashchange', function(e) {
+            window.addEvent(hc, function(e) {
                 var hash = location.hash,
                     path = hash.split('?')[0],
                     query = hash.split('?')[1] || '',
