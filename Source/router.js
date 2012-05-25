@@ -64,6 +64,8 @@ inspiration: http://documentcloud.github.com/backbone/#Router
             // '#!path/:query/:id?': 'eventname',
         },
 
+        boundEvents: {},
+
         initialize: function(options) {
             var self = this;
 
@@ -165,6 +167,36 @@ inspiration: http://documentcloud.github.com/backbone/#Router
             }).replace(/([\/.])/g, '\\$1').replace(/\*/g, '(.*)');
 
             return new RegExp('^' + path + '$', sensitive ? '' : 'i');
+        },
+
+        addRoute: function(obj) {
+            // adds a new route, expects keys @route (string), @id (string), @events (object)
+            if (!obj || !obj.route || !obj.id || !obj.events)
+                return this.fireEvent('error', 'Please include route, id and events in the argument object when adding a route');
+
+            if (!obj.id.length)
+                return this.fireEvent('error', 'Route id cannot be empty, aborting');
+
+            if (this.routes[obj.route])
+                return this.fireEvent('error', 'Route "{route}" or id "{id}" already exists, aborting'.substitute(obj));
+
+
+            this.routes[obj.route] = obj.id;
+            this.addEvents(this.boundEvents[obj.route] = obj.events);
+
+            return this.fireEvent('route:add', obj);
+        },
+
+        removeRoute: function(route) {
+            if (!route || !this.routes[route] || !this.boundEvents[route])
+                return this.fireEvent('error', 'Could not find route or route is not removable');
+
+            this.removeEvents(this.boundEvents[route]);
+
+            delete this.routes[route];
+            delete this.boundEvents[route];
+
+            return this.fireEvent('route:remove', route);
         }
 
     });

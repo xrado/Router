@@ -1,6 +1,6 @@
 window.addEvent('domready',function(){
 	
-    new Router({
+    var router = new Router({
 		// routes definition
 		routes: {
 			''						: 'index',
@@ -65,9 +65,28 @@ window.addEvent('domready',function(){
 
         onUndefined: function() {
             console.log('this is an undefined route');
+        },
+
+        'onRoute:remove': function(route) {
+            alert(route + ' was removed by popular demand');
+        },
+
+        'onRoute:add': function(constructorObject) {
+            console.log(constructorObject.id + ' was added as a new route');
         }
 
 	});
 	
+    router.addRoute({
+        route: '#!dynamicRoute',
+        id: 'dynamic',
+        events: {
+            onDynamic: function() {
+                alert('you found the blowfish');
+                if (confirm('remove this route?'))
+                    this.removeRoute('#!dynamicRoute');
+            }
+        }
+    });
 
 });
