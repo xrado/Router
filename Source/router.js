@@ -46,7 +46,10 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 					eventHosts.invoke('fireEvent', hc, hash.indexOf('#') == 0 ? hash.substr(1) : hash);
 				};
 
-			(hcSupported && (window.onhashchange = check)) || check.periodical(100);
+			window.onhashchange = hcSupported ? check : check.periodical(100);
+		},
+		onRemove: function(){
+			(hcSupported && (window.onhashchange = null)) || clearInterval(window.onhashchange);
 		}
 	};
 
@@ -66,27 +69,23 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 
 		boundEvents: {},
 
-		preventTrigger: false,
-
 		initialize: function(options) {
 			var self = this;
 
 			this.setOptions(options);
 			this.options.routes && (this.routes = this.options.routes);
 
-			window.addEvent(hc, this.routing.bind(this,[false]));
+			this.attachRouting();
 
 			this.fireEvent('ready');
 			this.options.triggerOnLoad && window.fireEvent(hc);
 		},
 
-		routing: function(_return) {
-			
-			if(this.preventTrigger && !_return){
-				this.preventTrigger = false;
-				return;
-			}
+		attachRouting:function(){
+			window.addEvent(hc, this.routing.bind(this,[false]));
+		},
 
+		routing: function(_return) {
 			var hash = location.hash,
 				path = hash.split('?')[0],
 				query = hash.split('?')[1] || '',
@@ -155,7 +154,7 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 		},
 
 		navigate: function(route, trigger) {
-			typeof trigger !== 'undefined' && !trigger && (this.preventTrigger = true);
+			typeof trigger !== 'undefined' && !trigger && window.removeEvents(hc);
 			
 			if (location.hash == route && trigger) {
 				window.fireEvent(hc);
@@ -163,6 +162,8 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 			else {
 				location.hash = route;
 			}
+
+			typeof trigger !== 'undefined' && !trigger && this.attachRouting();
 		},
 
 		normalize: function(path, keys, sensitive, strict) {
