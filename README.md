@@ -77,8 +77,7 @@ How to use
         },
 
 
-        /// Sub router - prefixed router
-
+        // Sub router - prefixed router
         onSub: function(){
             console.log('root sub');
             if(App.SubRouter) return;
@@ -88,7 +87,6 @@ How to use
                 routes: {
                     ''					: 'index',
                     'help'				: 'help'
-
                 },
 
                 onIndex: function(){
@@ -98,9 +96,7 @@ How to use
                 onHelp: function(){
                     console.log('sub help');
                 }
-
             });
-
         },
 
 
