@@ -101,12 +101,8 @@
 			if(this.options.prefix) {
 				var _routes = {};
 				Object.each(this.routes,function(name,route){
-					var newroute;
-
-					if(route.substr(0,1) == '/') newroute = self.options.prefix.slice(0,-1) + route;
-					else newroute = route ? self.options.prefix + route : self.options.prefix.slice(0,-1);
-
-					_routes[newroute] = name;
+					route = self.normalizeRoute(route);
+					_routes[route] = name;
 				});
 				this.routes = _routes;
 			}
@@ -182,6 +178,14 @@
 
 		},
 
+		normalizeRoute: function(route){
+			if(this.options.prefix){
+				if(route.substr(0,1) == '/') route = this.options.prefix.slice(0,-1) + route;
+				else route = route ? this.options.prefix + route : this.options.prefix.slice(0,-1);
+			}
+			return route;
+		},
+
 		normalize: function(path, keys, sensitive, strict) {
 			if (toString.call(path) == '[object RegExp]') return path;
 			if (Array.isArray(path)) path = '(' + path.join('|') + ')';
@@ -206,10 +210,7 @@
 
 		navigate: function(route, trigger) {
 			var self = this;
-			if(this.options.prefix){
-				if(route.substr(0,1) == '/') route = this.options.prefix.slice(0,-1) + route;
-				else route = route ? this.options.prefix + route : this.options.prefix.slice(0,-1);
-			}
+			route = this.normalizeRoute(route);
 
 			if(typeof trigger !== 'undefined' && !trigger) {
 				HashMonitor.removeEvent('change',this.boundRouting);
@@ -237,12 +238,7 @@
 			if (!obj.id.length)
 				return this.fireEvent('error', 'Route id cannot be empty, aborting');
 
-			if(this.options.prefix){
-				var newroute;
-				if(route.substr(0,1) == '/') newroute = this.options.prefix.slice(0,-1) + route;
-				else newroute = route ? this.options.prefix + route : this.options.prefix.slice(0,-1);
-				obj.route = newroute;
-			}
+			obj.route = this.normalizeRoute(obj.route);
 
 			if (this.routes[obj.route])
 				return this.fireEvent('error', 'Route "{route}" or id "{id}" already exists, aborting'.substitute(obj));
@@ -254,12 +250,7 @@
 		},
 
 		removeRoute: function(route) {
-			if(this.options.prefix){
-				var newroute;
-				if(route.substr(0,1) == '/') newroute = this.options.prefix.slice(0,-1) + route;
-				else newroute = route ? this.options.prefix + route : this.options.prefix.slice(0,-1);
-				route = newroute;
-			}
+			route = this.normalizeRoute(route);
 
 			if (!route || !this.routes[route] || !this.boundEvents[route])
 				return this.fireEvent('error', 'Could not find route or route is not removable');
