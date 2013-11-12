@@ -1,34 +1,35 @@
-<!doctype html>  
+<!doctype html>
 <html lang="en">
 <head>
 	<meta charset="utf-8" />
 	<title></title>
 	<meta name="description" content="" />
 	<meta name="author" content="" />
-	
+
 	<!-- CSS -->
 
 	<!-- JavaScript -->
 	<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/mootools/1.4.5/mootools-yui-compressed.js"></script>
-	<script type="text/javascript" src="mootools-more.js"></script>
 	<script type="text/javascript" src="../Source/router.js"></script>
 	<script type="text/javascript" src="domready.js"></script>
 </head>
 <body>
 
-    <ul>
-        <li><a href="#!help">help</a></li>
-        <li><a href="#!test1/arg1/id12323?qwe=1&a=b">test 1 - 2 args</a></li>
-        <li><a href="#!test1/asdfasdf?qwe=1&a=basd">test 1 - no id</a></li>
-        <li><a href="#!test2/asdfasdf/werwer">test2 route</a></li>
-        <li><a href="#!error">error, no handler -> onError</a></li>
-        <li><a href="#!unknown">error, undefined -> onUndefined</a></li>
-        <li><a href="#!dynamicRoute">dynamic, route added later via addRoute</a></li>
-    </ul>
+	<ul>
+		<li><a href="#!help">help</a></li>
+		<li><a href="#!test1/arg1/id12323?qwe=1&a=b">test 1 - 2 args</a></li>
+		<li><a href="#!test1/asdfasdf?qwe=1&a=basd">test 1 - no id</a></li>
+		<li><a href="#!test2/asdfasdf/werwer">test2 route</a></li>
+		<li><a href="#!error">error, no handler -> onError</a></li>
+		<li><a href="#!unknown">error, undefined -> onUndefined</a></li>
+	</ul>
+	<br/> prefixed router
+	<ul>
+		<li><a href="#!sub">#!sub</a></li>
+		<li><a href="#!sub/">#!sub/</a></li>
+		<li><a href="#!sub/help">#!sub/help</a></li>
+	</ul>
 	<br/>
-	<div id="center">
-	
-	</div>
 
 </body>
 </html> 

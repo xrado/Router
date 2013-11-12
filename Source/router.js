@@ -1,22 +1,22 @@
 /*
----
+ ---
 
-name: Router
+ name: Router
 
-license: MIT-style license.
+ license: MIT-style license.
 
-authors: [Radovan Lozej, DimitarChristoff]
+ authors: [Radovan Lozej, DimitarChristoff]
 
-requires:
+ requires:
  - Core/DOMEvent
  - Core/Class
 
-provides: Router
+ provides: Router
 
-inspiration: http://documentcloud.github.com/backbone/#Router
+ inspiration: http://documentcloud.github.com/backbone/#Router
 
-...
-*/
+ ...
+ */
 ;(function() {
 
 	var hc = 'hashchange',
@@ -53,6 +53,27 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 		}
 	};
 
+	// Hash monitor
+	var Monitor = new Class({
+
+		Implements: [Events],
+
+		start: function(){
+			this.boundChange = this.change.bind(this);
+			window.addEvent('hashchange',this.boundChange);
+		},
+
+		stop: function(){
+			window.removeEvent('hashchange',this.boundChange);
+		},
+
+		change: function(hash){
+			this.fireEvent('change',hash);
+		}
+	});
+
+	this.HashMonitor = new Monitor();
+
 
 	// Router
 	this.Router = new Class({
@@ -60,6 +81,7 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 		Implements: [Options, Events],
 
 		options: {
+			prefix: '',
 			triggerOnLoad : true // check route on load
 		},
 
@@ -70,19 +92,31 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 		boundEvents: {},
 
 		initialize: function(options) {
-			var self = this;
-
+			var self = this
 			this.setOptions(options);
+
+			if(this.options.prefix && this.options.prefix.substr(-1) !== '/') this.options.prefix += "/";
 			this.options.routes && (this.routes = this.options.routes);
 
-			this.attachRouting();
+			if(this.options.prefix) {
+				var _routes = {};
+				Object.each(this.routes,function(name,route){
+					var newroute;
+
+					if(route.substr(0,1) == '/') newroute = self.options.prefix.slice(0,-1) + route;
+					else newroute = route ? self.options.prefix + route : self.options.prefix.slice(0,-1);
+
+					_routes[newroute] = name;
+				});
+				this.routes = _routes;
+			}
+
+			this.boundRouting = this.routing.bind(this,[false]);
+			HashMonitor.addEvent('change',this.boundRouting);
 
 			this.fireEvent('ready');
-			this.options.triggerOnLoad && window.fireEvent(hc);
-		},
 
-		attachRouting:function(){
-			window.addEvent(hc, this.routing.bind(this,[false]));
+			this.options.triggerOnLoad && this.routing(false);
 		},
 
 		routing: function(_return) {
@@ -111,7 +145,7 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 
 					this.route = route;
 					this.param = param || {};
-					this.query = query && getQueryString(query);
+					this.query = query && getQueryString(query) || {};
 
 					if(_return) return this;
 
@@ -148,47 +182,51 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 
 		},
 
-		// get route params after navigate with prevent triggering
-		getRoute: function(){
-			return this.routing(true);
+		normalize: function(path, keys, sensitive, strict) {
+			if (toString.call(path) == '[object RegExp]') return path;
+			if (Array.isArray(path)) path = '(' + path.join('|') + ')';
+			path = path
+				.concat(strict ? '' : '/?')
+				.replace(/\/\(/g, '(?:/')
+				.replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?(\*)?/g, function(_, slash, format, key, capture, optional, star){
+					keys.push({ name: key, optional: !! optional });
+					slash = slash || '';
+					return ''
+						+ (optional ? '' : slash)
+						+ '(?:'
+						+ (optional ? slash : '')
+						+ (format || '') + (capture || (format && '([^/.]+?)' || '([^/]+?)')) + ')'
+						+ (optional || '')
+						+ (star ? '(/*)?' : '');
+				})
+				.replace(/([\/.])/g, '\\$1')
+				.replace(/\*/g, '(.*)');
+			return new RegExp('^' + path + '$', sensitive ? '' : 'i');
 		},
 
 		navigate: function(route, trigger) {
-			typeof trigger !== 'undefined' && !trigger && window.removeEvents(hc);
-			
-			if (location.hash == route && trigger) {
-				window.fireEvent(hc);
+			var self = this;
+			if(this.options.prefix){
+				if(route.substr(0,1) == '/') route = this.options.prefix.slice(0,-1) + route;
+				else route = route ? this.options.prefix + route : this.options.prefix.slice(0,-1);
 			}
-			else {
+
+			if(typeof trigger !== 'undefined' && !trigger) {
+				HashMonitor.removeEvent('change',this.boundRouting);
+			}
+
+			if (location.hash == route && trigger) {
+				window.fireEvent('hashchange');
+			} else {
 				location.hash = route;
 			}
 
-			typeof trigger !== 'undefined' && !trigger && this.attachRouting();
-		},
-
-		normalize: function(path, keys, sensitive, strict) {
-			// normalize by https://github.com/visionmedia/express
-			if (path instanceof RegExp) return path;
-
-			path = path.concat(strict ? '' : '/?').replace(/\/\(/g, '(?:/').replace(/(\/)?(\.)?:(\w+)(?:(\(.*?\)))?(\?)?/g, function(_, slash, format, key, capture, optional) {
-
-				keys.push({
-					name: key,
-					optional: !! optional
-				});
-
-				slash = slash || '';
-
-				return [
-					(optional ? '' : slash),
-					'(?:',
-					(optional ? slash : ''),
-					(format || '') + (capture || (format && '([^/.]+?)' || '([^/]+?)')) + ')',
-					(optional || '')
-				].join('');
-			}).replace(/([\/.])/g, '\\$1').replace(/\*/g, '(.*)');
-
-			return new RegExp('^' + path + '$', sensitive ? '' : 'i');
+			if(typeof trigger !== 'undefined' && !trigger) {
+				this.routing(true);
+				(function(){
+					HashMonitor.addEvent('change',self.boundRouting);
+				}).delay(0);
+			}
 		},
 
 		addRoute: function(obj) {
@@ -199,9 +237,15 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 			if (!obj.id.length)
 				return this.fireEvent('error', 'Route id cannot be empty, aborting');
 
+			if(this.options.prefix){
+				var newroute;
+				if(route.substr(0,1) == '/') newroute = this.options.prefix.slice(0,-1) + route;
+				else newroute = route ? this.options.prefix + route : this.options.prefix.slice(0,-1);
+				obj.route = newroute;
+			}
+
 			if (this.routes[obj.route])
 				return this.fireEvent('error', 'Route "{route}" or id "{id}" already exists, aborting'.substitute(obj));
-
 
 			this.routes[obj.route] = obj.id;
 			this.addEvents(this.boundEvents[obj.route] = obj.events);
@@ -210,6 +254,13 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 		},
 
 		removeRoute: function(route) {
+			if(this.options.prefix){
+				var newroute;
+				if(route.substr(0,1) == '/') newroute = this.options.prefix.slice(0,-1) + route;
+				else newroute = route ? this.options.prefix + route : this.options.prefix.slice(0,-1);
+				route = newroute;
+			}
+
 			if (!route || !this.routes[route] || !this.boundEvents[route])
 				return this.fireEvent('error', 'Could not find route or route is not removable');
 
@@ -219,6 +270,10 @@ inspiration: http://documentcloud.github.com/backbone/#Router
 			delete this.boundEvents[route];
 
 			return this.fireEvent('route:remove', route);
+		},
+
+		destroy: function(){
+			HashMonitor.removeEvent('change',this.boundRouting);
 		}
 
 	});
