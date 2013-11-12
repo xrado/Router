@@ -6,13 +6,16 @@ Router provides methods for routing client-side pages, and connecting them to ac
 How to use
 ----------
 
-	var router = new Router({
+	var App = {};
+
+	App.Router = new Router({
         // routes definition
         routes: {
             ''						: 'index',
             '#!help'				: 'help',
             '#!test1/:query/:id?'	: 'test1',
             '#!test2/:query/*'		: 'test2',
+            '#!sub(?:/*)?'	        : 'sub',
             '#!error'               : 'dummyerror'
         },
 
@@ -73,6 +76,34 @@ How to use
             console.log('this is an undefined route');
         },
 
+
+        /// Sub router - prefixed router
+
+        onSub: function(){
+            console.log('root sub');
+            if(App.SubRouter) return;
+
+            App.SubRouter = new Router({
+                prefix: '#!sub/',
+                routes: {
+                    ''					: 'index',
+                    'help'				: 'help'
+
+                },
+
+                onIndex: function(){
+                    console.log('sub index');
+                },
+
+                onHelp: function(){
+                    console.log('sub help');
+                }
+
+            });
+
+        },
+
+
         'onRoute:remove': function(route) {
             alert(route + ' was removed by popular demand');
         },
@@ -83,7 +114,7 @@ How to use
 
     });
 
-    router.addRoute({
+    App.Router.addRoute({
         route: '#!dynamicRoute',
         id: 'dynamic',
         events: {
